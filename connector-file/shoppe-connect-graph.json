@@ -1,0 +1,14 @@
+{
+  "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+  "topics": "shopee-api-product",
+  "tasks.max": "6",
+  "neo4j.server.uri": "bolt://neo4j:7687",
+  "neo4j.batch.size": "800",
+  "neo4j.batch.timeout.msecs": "320000",
+  "neo4j.database": shoppee
+  "neo4j.topic.cypher.shopee-api-product": "WITH event.profile_id as profile_id, event WHERE profile_id <> \"\" AND event.topics <> [] CALL apoc.merge.node(['ENTRY'], {id: event.entry_id}, {created_time: event.crawled_at,id: event.entry_id,entry_rowkey: event.entry_rowkey,topics: event.topics, sentiment: event.sentiment}, {created_time: event.crawled_at,id: event.entry_id,entry_rowkey: event.entry_rowkey,topics: event.topics, sentiment: event.sentiment}) yield node as node1 CALL apoc.merge.node(['PROFILE'], {id: event.profile_id}, {id: event.profile_id,name: event.profile_name,created_time: event.crawled_at,type: event.profile_type}, {id: event.profile_id,name: event.profile_name,created_time: event.crawled_at, type: event.profile_type}) yield node as node2 CALL apoc.merge.relationship(node2,'POST',{},{created_time: event.crawled_at},node1,{}) yield rel return node1,node2,rel",
+  "value.converter.schemas.enable": "false",
+  "errors.tolerance": "all",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter"
+}
